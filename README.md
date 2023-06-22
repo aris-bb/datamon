@@ -25,4 +25,4 @@ datamon::Datamon dm{ reinterpret_cast<uintptr_t>(my_data), sizeof(*my_data), cal
 my_data->value = 123; // prints "callback!" to stdout
 ```
 
-Check out src/example in order to see the example usage.
+Check out [src/example](src/example) in order to see the example usage and demonstration of datamon.
