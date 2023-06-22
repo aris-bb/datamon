@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="libdatamon.hpp" />
+    <ClInclude Include="pch.hpp" />
+    <ClInclude Include="interval_tree.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="libdatamon.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="interval_tree.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+  </ItemGroup>
+</Project>
