@@ -8,8 +8,7 @@ namespace datamon {
 //! @param accessing_address The address of the code that is accessing the data.
 //! @param read Whether the data is being read or written.
 //! @param data The data being read or written.
-using InterceptorFn = void (*)(uintptr_t accessing_address, bool read,
-                               void* data);
+using InterceptorFn = void (*)(void* accessing_address, bool read, void* data);
 
 //! @brief Allows you to intercept access to arbitrary data.
 class Datamon {
@@ -19,7 +18,7 @@ class Datamon {
   //! @param size The size of the data to be monitored.
   //! @param interceptor The interceptor callback function to call when the data
   //! is accessed.
-  Datamon(uintptr_t address, size_t size, InterceptorFn interceptor);
+  Datamon(void* address, size_t size, InterceptorFn interceptor);
   ~Datamon();
 
   Datamon(const Datamon&) = delete;
@@ -28,7 +27,7 @@ class Datamon {
   Datamon& operator=(Datamon&&) = delete;
 
  private:
-  uintptr_t address_;
+  void* address_;
   size_t size_;
   InterceptorFn interceptor_;
 

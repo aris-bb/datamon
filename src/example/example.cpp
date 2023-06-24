@@ -10,26 +10,27 @@ struct Player {
   char name[32];
 };
 
+void callback(void* accessing_address, bool read, void* data) {
+  // this callback is called whenever the example data is accessed
+
+  // print "[DATAMON]" in red
+  std::cout << "\033[1;31m[DATAMON]\033[0m";
+
+  // print other information about the access
+  std::cout << " Intercepted " << (read ? "read" : "write")
+            << ". Data address: " << std::hex
+            << reinterpret_cast<uintptr_t>(data) << std::dec
+            << ", caused from: " << std::hex
+            << reinterpret_cast<uintptr_t>(accessing_address) << std::dec
+            << ".\n";
+}
+
 int main() {
   // allocate the example data on the heap
   auto player = std::make_unique<Player>();
 
   // initialize datamon and watch the example data
-  datamon::Datamon dm{
-      reinterpret_cast<uintptr_t>(player.get()), sizeof(*player),
-      [](uintptr_t accessing_address, bool read, void* data) {
-        // this callback is called whenever the example data is accessed
-
-        // print "[DATAMON]" in red
-        std::cout << "\033[1;31m[DATAMON]\033[0m";
-
-        // print other information about the access
-        std::cout << " Intercepted " << (read ? "read" : "write")
-                  << ". Data address: " << std::hex
-                  << reinterpret_cast<uintptr_t>(data) << std::dec
-                  << ", caused from: " << std::hex << accessing_address
-                  << std::dec << ".\n";
-      }};
+  datamon::Datamon dm{player.get(), sizeof(*player), callback};
 
   // do some stuff with the example data and see how datamon intercepts it
   // all of the accesses below will be intercepted by datamon

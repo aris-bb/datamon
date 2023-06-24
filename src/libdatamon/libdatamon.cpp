@@ -70,8 +70,8 @@ LONG NTAPI handler(PEXCEPTION_POINTERS exception_pointers) {
 #endif
 
     // address of code that caused the exception
-    uintptr_t accessing_address =
-        static_cast<uintptr_t>(exception_pointers->ContextRecord->XIP);
+    void* accessing_address =
+        reinterpret_cast<void*>(exception_pointers->ContextRecord->XIP);
 
     bool read =
         exception_pointers->ExceptionRecord->ExceptionInformation[0] == 0;
@@ -111,8 +111,7 @@ LONG NTAPI handler(PEXCEPTION_POINTERS exception_pointers) {
   return EXCEPTION_CONTINUE_SEARCH;
 }
 
-datamon::Datamon::Datamon(uintptr_t address, size_t size,
-                          InterceptorFn interceptor)
+datamon::Datamon::Datamon(void* address, size_t size, InterceptorFn interceptor)
     : address_(address), size_(size), interceptor_(interceptor) {
   std::unique_lock lock{veh_mutex()};
 
@@ -126,20 +125,24 @@ datamon::Datamon::Datamon(uintptr_t address, size_t size,
 
   ++veh_refcount;
 
+  const uintptr_t address_value = reinterpret_cast<uintptr_t>(address_);
+
   // add the interceptor function to the interval tree
-  interceptor_entry_id_ =
-      interval_tree().insert({address_, address_ + size_, interceptor_});
+  interceptor_entry_id_ = interval_tree().insert(
+      {address_value, address_value + size_, interceptor_});
 
   // set the memory protection
-  protect_memory(address_, size_,
+  protect_memory(address_value, size_,
                  [](DWORD protect) { return protect | PAGE_GUARD; });
 }
 
 datamon::Datamon::~Datamon() {
   std::unique_lock lock{veh_mutex()};
 
+  const uintptr_t address_value = reinterpret_cast<uintptr_t>(address_);
+
   // restore the memory protection
-  protect_memory(address_, size_,
+  protect_memory(address_value, size_,
                  [](DWORD protect) { return protect & ~PAGE_GUARD; });
 
   // erase the interceptor function from the interval tree
