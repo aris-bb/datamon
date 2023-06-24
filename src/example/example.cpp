@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 
 #include "../libdatamon/libdatamon.hpp"
 
@@ -31,6 +32,9 @@ void callback(void* accessing_address, bool read, void* data) {
 }
 
 int main() {
+  // wait a bit to ensure console is ready
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
   // allocate the example data on the heap
   auto player = std::make_unique<Player>();
 
@@ -72,6 +76,10 @@ int main() {
   char name[32];
   strcpy_s(name, player->name);
   std::cout << "Name: " << name << "\n";
+
+  // wait for user input to exit
+  std::cout << "Press enter to exit..." << std::endl;
+  std::cin.get();
 
   return 0;
 }
