@@ -8,6 +8,11 @@ struct Player {
   int armor;
   int ammo;
   char name[32];
+
+  // padding to make the struct as big as the page size
+  // otherwise the PAGE_GUARD flag might interfere with other memory
+  // preventing the callback from being called, etc.
+  char padding[4052];
 };
 
 void callback(void* accessing_address, bool read, void* data) {
